@@ -1,56 +1,56 @@
 //
-//  MCIntent
-//  Manticore iOSViewFactory
+//  RFIntent
+//  RFViewFactory
 //
 //  Created by Richard Fung on 9/19/12.
-//  Copyright (c) 2013 Yeti LLC. All rights reserved.
+//  Copyright (c) 2013 rhfung. All rights reserved.
 //
 
-#import "MCIntent.h"
+#import "RFIntent.h"
 
-@implementation MCIntent
+@implementation RFIntent
 
 
 +(id) intentWithSectionName: (NSString*)name
 {
-  MCIntent* newIntent = [MCIntent alloc];
+  RFIntent* newIntent = [RFIntent alloc];
   return [newIntent initWithSectionName:name];
 }
 
 +(id) intentWithSectionName:(NSString*)name andSavedInstance:(NSMutableDictionary*)savedInstanceState
 {
-  MCIntent* newIntent = [MCIntent alloc];
+  RFIntent* newIntent = [RFIntent alloc];
   return [newIntent initWithSectionName:name andSavedInstance:savedInstanceState];
 }
 
 +(id) intentWithSectionName: (NSString*)name andAnimation:(UIViewAnimationOptions)animation
 {
-  MCIntent* newIntent = [MCIntent alloc];
+  RFIntent* newIntent = [RFIntent alloc];
   return [newIntent initWithSectionName:name  andAnimation:animation];
 }
 
 
 +(id) intentWithSectionName:(NSString*)sectionName andViewName:(NSString*)viewName
 {
-  MCIntent* newIntent = [MCIntent alloc];
+  RFIntent* newIntent = [RFIntent alloc];
   return [newIntent initWithSectionName:sectionName viewName:viewName];
 
 }
 
 +(id) intentWithSectionName:(NSString*)sectionName andViewName:(NSString*)viewName andAnimation:(UIViewAnimationOptions)animation
 {
-  MCIntent* newIntent = [[MCIntent alloc] initWithSectionName:sectionName viewName:viewName andAnimation:animation];
+  RFIntent* newIntent = [[RFIntent alloc] initWithSectionName:sectionName viewName:viewName andAnimation:animation];
   return newIntent;
 }
 
 // intent for going to the last view, no animation
 +(id) intentPreviousSection{
-  return [MCIntent intentWithSectionName:SECTION_LAST];
+  return [RFIntent intentWithSectionName:SECTION_LAST];
 }
 
 // intent for going to the last view, any animation
 +(id) intentPreviousSectionWithAnimation:(UIViewAnimationOptions)animation{
-  return [MCIntent intentWithSectionName:SECTION_LAST andAnimation:animation];
+  return [RFIntent intentWithSectionName:SECTION_LAST andAnimation:animation];
 }
 
 
@@ -154,7 +154,7 @@
 }
 
 -(NSString *)description{
-  return [NSString stringWithFormat:@"MCIntent section=%@, view=%@, dictionary=%@", self.sectionName, self.viewName, self.savedInstanceState];
+  return [NSString stringWithFormat:@"RFIntent section=%@, view=%@, dictionary=%@", self.sectionName, self.viewName, self.savedInstanceState];
 }
 
 @end

@@ -1,15 +1,15 @@
 //
 //  ErrorViewController.m
-//  Manticore iOSViewFactory
+//  RFViewFactory
 //
 //  Created by Anthony Scherba on 7/9/12.
-//  Copyright (c) 2013 Yeti LLC. All rights reserved.
+//  Copyright (c) 2013 rhfung. All rights reserved.
 //
 
-#import "MCErrorViewController.h"
-#import "MCViewModel.h"
+#import "RFErrorViewController.h"
+#import "RFViewModel.h"
 
-@implementation MCErrorViewController
+@implementation RFErrorViewController
 
 
 -(id)init{
@@ -43,7 +43,7 @@
 }
 
 -(void)loadLatestErrorMessage{
-  NSDictionary *errorDict = [[MCViewModel sharedModel] errorDict];
+  NSDictionary *errorDict = [[RFViewModel sharedModel] errorDict];
   
   NSString *title = [errorDict objectForKey: @"title"];
   NSString *description = [errorDict objectForKey: @"description"];

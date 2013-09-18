@@ -1,20 +1,20 @@
 //
-//  MCViewFactory.h
-//  Manticore iOSViewFactory
+//  RFViewFactory.h
+//  RFViewFactory
 //
 //  Created by Richard Fung on 1/31/13.
-//  Copyright (c) 2013 Yeti LLC. All rights reserved.
+//  Copyright (c) 2013 rhfung. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import "MCConstants.h"
+#import "RFConstants.h"
 
-@interface MCViewFactory : NSObject{
+@interface RFViewFactory : NSObject{
   NSMutableDictionary* viewControllers;
 }
 
 // singleton object
-+(MCViewFactory*)sharedFactory;
++(RFViewFactory*)sharedFactory;
 
 // call this method on load
 -(void)registerView:(NSString*)sectionOrViewName;

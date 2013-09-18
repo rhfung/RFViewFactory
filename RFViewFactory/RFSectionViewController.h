@@ -1,15 +1,15 @@
 //
-//  MCSectionViewController.h
-//  Manticore iOSViewFactory
+//  RFSectionViewController.h
+//  RFViewFactory
 //
 //  Created by Richard Fung on 2/7/13.
-//  Copyright (c) 2013 Yeti LLC. All rights reserved.
+//  Copyright (c) 2013 rhfung. All rights reserved.
 //
 
-#import "MCViewController.h"
+#import "RFViewController.h"
 
-@interface MCSectionViewController : MCViewController{
-  // The following two variables didViewLoad and showThisView should only be used by MCMainViewController
+@interface RFSectionViewController : RFViewController{
+  // The following two variables didViewLoad and showThisView should only be used by RFMainViewController
   // to load the VIEW_*** for SECTION_***. Two cases:
   //
   // 1.  The first time the view is loaded, the IBOutlets from the nib
@@ -24,6 +24,6 @@
 }
 
 @property(nonatomic, retain) IBOutlet UIView* innerView;
-@property(nonatomic, retain) MCViewController* currentViewVC;
+@property(nonatomic, retain) RFViewController* currentViewVC;
 
 @end

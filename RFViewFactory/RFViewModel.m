@@ -1,14 +1,14 @@
 //
-//  MCAppModel.m
-//  Manticore iOSViewFactory
+//  RFAppModel.m
+//  RFViewFactory
 //
 //  Created by Richard Fung on 3/15/13.
-//  Copyright (c) 2013 Yeti LLC. All rights reserved.
+//  Copyright (c) 2013 rhfung. All rights reserved.
 //
 
-#import "MCViewModel.h"
+#import "RFViewModel.h"
 
-@implementation MCViewModel
+@implementation RFViewModel
 
 @synthesize errorDict;
 @synthesize currentSection;
@@ -16,11 +16,11 @@
 @synthesize screenOverlay;
 @synthesize stackSize;
 
-MCViewModel* _sharedModel;
+RFViewModel* _sharedModel;
 
-+(MCViewModel*)sharedModel
++(RFViewModel*)sharedModel
 {
-	@synchronized([MCViewModel class])
+	@synchronized([RFViewModel class])
 	{
 		if (!_sharedModel)
 			_sharedModel = [[self alloc] init];
@@ -43,7 +43,7 @@ MCViewModel* _sharedModel;
 }
 
 -(void)clearViewCache{
-  [[NSNotificationCenter defaultCenter] postNotificationName:@"MCMainViewController_flushViewCache" object:self];
+  [[NSNotificationCenter defaultCenter] postNotificationName:@"RFMainViewController_flushViewCache" object:self];
 }
 
 -(void) setErrorTitle:(NSString*) title andDescription:(NSString*) description

@@ -1,19 +1,19 @@
 //
-//  MCSectionViewController.m
-//  Manticore iOSViewFactory
+//  RFSectionViewController.m
+//  RFViewFactory
 //
 //  Created by Richard Fung on 2/7/13.
-//  Copyright (c) 2013 Yeti LLC. All rights reserved.
+//  Copyright (c) 2013 rhfung. All rights reserved.
 //
 
-#import "MCSectionViewController.h"
-#import "MCViewFactory.h"
+#import "RFSectionViewController.h"
+#import "RFViewFactory.h"
 
-@interface MCSectionViewController ()
+@interface RFSectionViewController ()
 
 @end
 
-@implementation MCSectionViewController
+@implementation RFSectionViewController
 
 @synthesize innerView;
 @synthesize currentViewVC;
@@ -44,7 +44,7 @@
 }
 
 
--(void)onResume:(MCIntent *)intent{
+-(void)onResume:(RFIntent *)intent{
   [super onResume:intent];
   
   if (currentViewVC) {
@@ -54,7 +54,7 @@
   
 }
 
--(void)onPause:(MCIntent *)intent{
+-(void)onPause:(RFIntent *)intent{
   if (currentViewVC){
     [currentViewVC onPause:intent];
   }

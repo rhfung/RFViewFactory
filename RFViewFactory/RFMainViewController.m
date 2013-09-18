@@ -1,22 +1,22 @@
 //
-//  MCMainViewController.m
-//  Manticore iOSViewFactory
+//  RFMainViewController.m
+//  RFViewFactory
 //
 //  Created by Richard Fung on 1/22/13.
-//  Copyright (c) 2013 Yeti LLC. All rights reserved.
+//  Copyright (c) 2013 rhfung. All rights reserved.
 //
 
-#import "MCViewController.h"
-#import "MCViewModel.h"
-#import "MCErrorViewController.h"
-#import "MCMainViewController.h"
-#import "MCSectionViewController.h"
-#import "MCViewFactory.h"
+#import "RFViewController.h"
+#import "RFViewModel.h"
+#import "RFErrorViewController.h"
+#import "RFMainViewController.h"
+#import "RFSectionViewController.h"
+#import "RFViewFactory.h"
 
 
 
 // this function taken from http://stackoverflow.com/questions/10330679/how-to-dispatch-on-main-queue-synchronously-without-a-deadlock
-void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
+void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
 {
   if ([NSThread isMainThread])
   {
@@ -28,11 +28,7 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   }
 }
 
-@interface MCMainViewController ()
-
-@end
-
-@implementation MCMainViewController
+@implementation RFMainViewController
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -41,11 +37,11 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
     if (self) {
         // Custom initialization
       // register to listeners on model changes
-      [[MCViewModel sharedModel] addObserver:self forKeyPath:@"currentSection" options: NSKeyValueObservingOptionNew context: nil];
-      [[MCViewModel sharedModel] addObserver:self forKeyPath:@"errorDict" options: NSKeyValueObservingOptionNew context: nil];
-      [[MCViewModel sharedModel] addObserver:self forKeyPath:@"screenOverlay" options: NSKeyValueObservingOptionNew context: nil];
-      [[MCViewModel sharedModel] addObserver:self forKeyPath:@"screenOverlays" options: NSKeyValueObservingOptionNew context: nil];
-      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(flushViewCache:) name:@"MCMainViewController_flushViewCache" object:[MCViewModel sharedModel]]; // last parameter filters the response
+      [[RFViewModel sharedModel] addObserver:self forKeyPath:@"currentSection" options: NSKeyValueObservingOptionNew context: nil];
+      [[RFViewModel sharedModel] addObserver:self forKeyPath:@"errorDict" options: NSKeyValueObservingOptionNew context: nil];
+      [[RFViewModel sharedModel] addObserver:self forKeyPath:@"screenOverlay" options: NSKeyValueObservingOptionNew context: nil];
+      [[RFViewModel sharedModel] addObserver:self forKeyPath:@"screenOverlays" options: NSKeyValueObservingOptionNew context: nil];
+      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(flushViewCache:) name:@"RFMainViewController_flushViewCache" object:[RFViewModel sharedModel]]; // last parameter filters the response
     }
     return self;
 }
@@ -78,17 +74,17 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
 // callback from the observer listener pattern
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if ([keyPath isEqualToString:@"currentSection"]) {
-      manticore_runOnMainQueueWithoutDeadlocking(^{
-        [self goToSection:[MCViewModel sharedModel].currentSection];
+      rfvf_runOnMainQueueWithoutDeadlocking(^{
+        [self goToSection:[RFViewModel sharedModel].currentSection];
       });
     
   } 
   else if ([keyPath isEqualToString:@"errorDict"]) {
   //NSDictionary *errorDict = [change objectForKey:NSKeyValueChangeNewKey];
   //[errorDict objectForKey: @"name"];
-      manticore_runOnMainQueueWithoutDeadlocking(^{
+      rfvf_runOnMainQueueWithoutDeadlocking(^{
         if (!errorVC)
-          errorVC = (MCErrorViewController*) [[MCViewFactory sharedFactory] createViewController:VIEW_BUILTIN_ERROR];
+          errorVC = (RFErrorViewController*) [[RFViewFactory sharedFactory] createViewController:VIEW_BUILTIN_ERROR];
         
         // remove from the previous
         [errorVC.view removeFromSuperview];
@@ -108,13 +104,13 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
         [errorVC becomeFirstResponder]; // make the error dialog the first responder
       });
   }else if ([keyPath isEqualToString:@"screenOverlay"]){
-    manticore_runOnMainQueueWithoutDeadlocking(^{
-      [self overlaySlideshow:@[[MCViewModel sharedModel].screenOverlay]];
+    rfvf_runOnMainQueueWithoutDeadlocking(^{
+      [self overlaySlideshow:@[[RFViewModel sharedModel].screenOverlay]];
     });
   }
   else if ([keyPath isEqualToString:@"screenOverlays"]){
-    manticore_runOnMainQueueWithoutDeadlocking(^{
-      [self overlaySlideshow:[MCViewModel sharedModel].screenOverlays];
+    rfvf_runOnMainQueueWithoutDeadlocking(^{
+      [self overlaySlideshow:[RFViewModel sharedModel].screenOverlays];
     });
   }else{
     [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
@@ -129,7 +125,7 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
     if (screenOverlayButton){
       // fade out the overlay in 200 ms
       screenOverlayButton.alpha = 1.0;
-      [UIView animateWithDuration:MANTICORE_OVERLAY_ANIMATION_DURATION animations:^{
+      [UIView animateWithDuration:RFVIEWFACTORY_OVERLAY_ANIMATION_DURATION animations:^{
         screenOverlayButton.alpha = 0.0;
       } completion:^(BOOL finished) {
         [screenOverlayButton resignFirstResponder];
@@ -161,10 +157,10 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   
   // check screen dimensions
   CGRect appFrame = [[UIScreen mainScreen] bounds];
-  if (appFrame.size.height >= MANTICORE_IOS5_SCREEN_SIZE) // add in the _5 to the filename, shouldn't append .png
+  if (appFrame.size.height >= RFVIEWFACTORY_IOS5_SCREEN_SIZE) // add in the _5 to the filename, shouldn't append .png
   {
     // test for an iPhone 5 overlay. If available, use that overlay instead.
-    overlayName = [NSString stringWithFormat:@"%@%@", overlayName, MANTICORE_IOS5_OVERLAY_SUFFIX];
+    overlayName = [NSString stringWithFormat:@"%@%@", overlayName, RFVIEWFACTORY_IOS5_OVERLAY_SUFFIX];
     if ([UIImage imageNamed:overlayName]){
       imgOverlay = [UIImage imageNamed:overlayName];
     }
@@ -177,7 +173,7 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
     if (![self.view.subviews containsObject:screenOverlayButton]){
       screenOverlayButton.alpha = 0.0;
       [self.view addSubview:screenOverlayButton ];
-      [UIView animateWithDuration:MANTICORE_OVERLAY_ANIMATION_DURATION animations:^{
+      [UIView animateWithDuration:RFVIEWFACTORY_OVERLAY_ANIMATION_DURATION animations:^{
         screenOverlayButton.alpha = 1.0;
       }];
     }
@@ -185,7 +181,7 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
     [screenOverlayButton becomeFirstResponder];
   }else{
 #ifdef DEBUG
-    NSAssert(false, @"Screen overlay not found: %@", [MCViewModel sharedModel].screenOverlay);
+    NSAssert(false, @"Screen overlay not found: %@", [RFViewModel sharedModel].screenOverlay);
 #endif
   }
 
@@ -199,17 +195,17 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   [self overlaySlideshow:newArray];
 }
 
--(MCViewController*) loadOrCreateViewController:(NSString*)sectionOrViewName{
+-(RFViewController*) loadOrCreateViewController:(NSString*)sectionOrViewName{
   // create global view cache if it doesn't already exist
   if (!dictCacheView){
     dictCacheView = [NSMutableDictionary dictionaryWithCapacity:10];
   }
   
   // test for existence
-  MCViewController* vc = [dictCacheView objectForKey:sectionOrViewName];
+  RFViewController* vc = [dictCacheView objectForKey:sectionOrViewName];
   if (vc == nil){
     // create the view controller
-    vc = (MCViewController*) [[MCViewFactory sharedFactory] createViewController:sectionOrViewName];
+    vc = (RFViewController*) [[RFViewFactory sharedFactory] createViewController:sectionOrViewName];
     NSAssert(vc != nil, @"VC should exist");
     
     [vc onCreate];
@@ -219,65 +215,65 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   return vc;
 }
 
--(MCViewController*) forceLoadViewController:(NSString*)sectionOrViewName{
+-(RFViewController*) forceLoadViewController:(NSString*)sectionOrViewName{
   // create global view cache if it doesn't already exist
   if (!dictCacheView){
     dictCacheView = [NSMutableDictionary dictionaryWithCapacity:10];
   }
 
   // create the view controller
-  MCViewController* vc = (MCViewController*) [[MCViewFactory sharedFactory] createViewController:sectionOrViewName];
+  RFViewController* vc = (RFViewController*) [[RFViewFactory sharedFactory] createViewController:sectionOrViewName];
   NSAssert(vc != nil, @"VC should exist");
   [vc onCreate];
   [dictCacheView setObject:vc forKey:sectionOrViewName];
   return vc;
 }
 
--(void)pushToHistoryStack:(MCIntent*)intent{
-  if ([MCViewModel sharedModel].stackSize == STACK_SIZE_DISABLED){
+-(void)pushToHistoryStack:(RFIntent*)intent{
+  if ([RFViewModel sharedModel].stackSize == STACK_SIZE_DISABLED){
     // don't save anything to the stack
     return;
-  }else if ([MCViewModel sharedModel].stackSize != STACK_SIZE_UNLIMITED){
+  }else if ([RFViewModel sharedModel].stackSize != STACK_SIZE_UNLIMITED){
     // bound the size 
-    NSAssert([MCViewModel sharedModel].stackSize > 0, @"stack size must be positive");
+    NSAssert([RFViewModel sharedModel].stackSize > 0, @"stack size must be positive");
     
-    if ([MCViewModel sharedModel].historyStack.count >= [MCViewModel sharedModel].stackSize  && [MCViewModel sharedModel].historyStack > 0){
-      [[MCViewModel sharedModel].historyStack removeObjectAtIndex:0]; // remove the first object to keep the stack size bounded
+    if ([RFViewModel sharedModel].historyStack.count >= [RFViewModel sharedModel].stackSize  && [RFViewModel sharedModel].historyStack > 0){
+      [[RFViewModel sharedModel].historyStack removeObjectAtIndex:0]; // remove the first object to keep the stack size bounded
     }
   }
   
   // add the new object on the stack
-  [[[MCViewModel sharedModel] historyStack] addObject:intent];
+  [[[RFViewModel sharedModel] historyStack] addObject:intent];
 }
 
--(MCIntent*)popHistoryStack{
-  NSAssert([MCViewModel sharedModel].historyStack.count > 0, @"something should be on the stack");
+-(RFIntent*)popHistoryStack{
+  NSAssert([RFViewModel sharedModel].historyStack.count > 0, @"something should be on the stack");
   
-  if ([MCViewModel sharedModel].historyStack.count > 0){
-    [[MCViewModel sharedModel].historyStack removeLastObject]; // this is the shown view, we don't want to stay on this view so discard it
-    MCIntent* retIntent = [[MCViewModel sharedModel].historyStack lastObject]; // this is the previous view, we keep a ref to this
+  if ([RFViewModel sharedModel].historyStack.count > 0){
+    [[RFViewModel sharedModel].historyStack removeLastObject]; // this is the shown view, we don't want to stay on this view so discard it
+    RFIntent* retIntent = [[RFViewModel sharedModel].historyStack lastObject]; // this is the previous view, we keep a ref to this
     return retIntent;
   }
   
   return nil; // nothing on the history stack
 }
 
--(MCIntent*)loadIntentAndHandleHistoryStack:(MCIntent*)intent{
+-(RFIntent*)loadIntentAndHandleHistoryStack:(RFIntent*)intent{
   if ([[intent sectionName] isEqualToString:SECTION_LAST]){
     // but don't retain the SECTION or VIEW
     NSMutableDictionary* savedState = [NSMutableDictionary dictionaryWithDictionary:[intent savedInstanceState]];
     [savedState removeObjectForKey:@"viewName"]; // unusual design decision, sectionName is not saved in the savedState object
     
     // when  copying state values from the given intent, e.g., animation transition, to the old bundle
-    MCIntent* previousIntent = [self popHistoryStack];
+    RFIntent* previousIntent = [self popHistoryStack];
 #ifdef DEBUG
     if (previousIntent == nil){
-      if ([MCViewModel sharedModel].stackSize == STACK_SIZE_DISABLED){
-        NSLog(@"Cannot pop an empty stack because the stack size is set to STACK_SIZE_DISABLED. You should assign [MCViewModel sharedModel].stackSize on startup.");
-      }else if ([MCViewModel sharedModel].stackSize == STACK_SIZE_UNLIMITED){
-        NSLog(@"Navigating back in the history stack too many times. You can check for an empty history stack by inspecting [MCViewModel sharedModel].historyStack.count > 1");
-      }else if ([MCViewModel sharedModel].stackSize > 0){
-        NSLog(@"Cannot pop an empty stack. Perhaps your stack size = %d is too small? You should check [MCViewModel sharedModel].stackSize", [MCViewModel sharedModel].stackSize);
+      if ([RFViewModel sharedModel].stackSize == STACK_SIZE_DISABLED){
+        NSLog(@"Cannot pop an empty stack because the stack size is set to STACK_SIZE_DISABLED. You should assign [RFViewModel sharedModel].stackSize on startup.");
+      }else if ([RFViewModel sharedModel].stackSize == STACK_SIZE_UNLIMITED){
+        NSLog(@"Navigating back in the history stack too many times. You can check for an empty history stack by inspecting [RFViewModel sharedModel].historyStack.count > 1");
+      }else if ([RFViewModel sharedModel].stackSize > 0){
+        NSLog(@"Cannot pop an empty stack. Perhaps your stack size = %d is too small? You should check [RFViewModel sharedModel].stackSize", [RFViewModel sharedModel].stackSize);
       }else{
         NSLog(@"Unexpected stack size. Please ticket this problem to the developers.");
       }
@@ -301,7 +297,7 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   return intent;
 }
 
--(void)goToSection:(MCIntent*)intent{
+-(void)goToSection:(RFIntent*)intent{
   // handle the history stack
   intent = [self loadIntentAndHandleHistoryStack:intent];
   if (!intent)
@@ -309,23 +305,23 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   
   // load the appropriate views from cache
 
-  MCSectionViewController* sectionVC =  (MCSectionViewController*)  [self loadOrCreateViewController:[intent sectionName]];
-  NSAssert([sectionVC isKindOfClass:[MCSectionViewController class]], @"sections should be subclasses of MCSectionViewController");
+  RFSectionViewController* sectionVC =  (RFSectionViewController*)  [self loadOrCreateViewController:[intent sectionName]];
+  NSAssert([sectionVC isKindOfClass:[RFSectionViewController class]], @"sections should be subclasses of RFSectionViewController");
   
-  MCViewController* vc = nil;
+  RFViewController* vc = nil;
   if ([intent viewName]){
-    vc = (MCViewController*) [self loadOrCreateViewController:[intent viewName]];
-    NSAssert([vc isKindOfClass:[MCViewController class]], @"views should be subclasses of MCViewController");
+    vc = (RFViewController*) [self loadOrCreateViewController:[intent viewName]];
+    NSAssert([vc isKindOfClass:[RFViewController class]], @"views should be subclasses of RFViewController");
   
     // edge case: everything we are transitioning to is the same as the previous, need to create a new view
     if (sectionVC == currentSectionVC && vc == currentSectionVC.currentViewVC){
-//      sectionVC = (MCSectionViewController*) [self forceLoadViewController:[intent sectionName]];
-      vc = (MCViewController*) [self forceLoadViewController:[intent viewName]];
+//      sectionVC = (RFSectionViewController*) [self forceLoadViewController:[intent sectionName]];
+      vc = (RFViewController*) [self forceLoadViewController:[intent viewName]];
     }
   }else{
     // edge case: transitioning from itself to itself, need to create a new view
     if (sectionVC == currentSectionVC){
-      sectionVC = (MCSectionViewController*) [self forceLoadViewController:[intent sectionName]];
+      sectionVC = (RFSectionViewController*) [self forceLoadViewController:[intent sectionName]];
     }
   }
 
@@ -342,9 +338,9 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
     
 #ifdef DEBUG
     if (!currentSectionVC.debugTag)
-      NSLog(@"Subclass %@ of MCSectionViewController did not have its [super onPause:intent] called", currentSectionVC);
+      NSLog(@"Subclass %@ of RFSectionViewController did not have its [super onPause:intent] called", currentSectionVC);
     if (currentSectionVC.currentViewVC && !currentSectionVC.currentViewVC.debugTag)
-      NSLog(@"Subclass %@ of MCViewController did not have its [super onPause:intent] called", currentSectionVC.currentViewVC);
+      NSLog(@"Subclass %@ of RFViewController did not have its [super onPause:intent] called", currentSectionVC.currentViewVC);
 #endif
   }
 
@@ -363,13 +359,13 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   
 #ifdef DEBUG
   if (!currentSectionVC.debugTag)
-    NSLog(@"Subclass %@ of MCSectionViewController did not have its [super onResume:intent] called", currentSectionVC);
+    NSLog(@"Subclass %@ of RFSectionViewController did not have its [super onResume:intent] called", currentSectionVC);
   if (currentSectionVC.currentViewVC && !currentSectionVC.currentViewVC.debugTag)
-    NSLog(@"Subclass %@ of MCViewController did not have its [super onResume:intent] called", currentSectionVC.currentViewVC);
+    NSLog(@"Subclass %@ of RFViewController did not have its [super onResume:intent] called", currentSectionVC.currentViewVC);
 #endif
 }
 
--(void)loadNewSection:(MCSectionViewController*)sectionVC andView:(MCViewController*)viewVC withIntent:(MCIntent*)intent{
+-(void)loadNewSection:(RFSectionViewController*)sectionVC andView:(RFViewController*)viewVC withIntent:(RFIntent*)intent{
   int transitionStyle = [intent animationStyle];
   
   if (currentSectionVC != sectionVC){ // replace the section VC
@@ -383,13 +379,13 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
     [self.view addSubview:sectionVC.view];
 
 
-    MCSectionViewController* oldSectionVC = currentSectionVC;
+    RFSectionViewController* oldSectionVC = currentSectionVC;
     [oldSectionVC.currentViewVC resignFirstResponder];
     [oldSectionVC resignFirstResponder];
     
     // opResult becomes true when an animation is applied, then we don't need to call our other animation code
-//    BOOL opResult = [MCViewFactory applyTransitionToView:self.view transition:transitionStyle];
-    BOOL opResult = [MCViewFactory applyTransitionFromView:currentSectionVC.view toView:sectionVC.view transition:transitionStyle completion:^{
+//    BOOL opResult = [RFViewFactory applyTransitionToView:self.view transition:transitionStyle];
+    BOOL opResult = [RFViewFactory applyTransitionFromView:currentSectionVC.view toView:sectionVC.view transition:transitionStyle completion:^{
       if (oldSectionVC != currentSectionVC){
         [oldSectionVC.view removeFromSuperview];
         [oldSectionVC removeFromParentViewController];
@@ -416,7 +412,7 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   }
   
   // load the view inside the section
-  MCViewController* oldViewVC = sectionVC.currentViewVC;
+  RFViewController* oldViewVC = sectionVC.currentViewVC;
   
   // if the view controller is the same as before, don't load it again
   if (oldViewVC != viewVC){
@@ -434,7 +430,7 @@ void manticore_runOnMainQueueWithoutDeadlocking(void (^block)(void))
       [viewVC.view setFrame:rect];
       [sectionVC.innerView addSubview:viewVC.view];
 
-      BOOL opResult = [MCViewFactory applyTransitionFromView:oldViewVC.view toView:viewVC.view transition:transitionStyle completion:^{
+      BOOL opResult = [RFViewFactory applyTransitionFromView:oldViewVC.view toView:viewVC.view transition:transitionStyle completion:^{
         if (sectionVC.currentViewVC != oldViewVC){
           [oldViewVC.view removeFromSuperview];
           [oldViewVC removeFromParentViewController];

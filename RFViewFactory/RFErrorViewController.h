@@ -1,6 +1,6 @@
 //
 //  ErrorViewController.h
-//  Manticore iOSViewFactory
+//  RFViewFactory
 //
 //  Created by Anthony Scherba on 7/9/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
@@ -12,7 +12,7 @@
 // title
 // description
 
-@interface MCErrorViewController : UIViewController {
+@interface RFErrorViewController : UIViewController {
   IBOutlet UILabel *titleLabel;
   IBOutlet UILabel *descripLabel;
 }

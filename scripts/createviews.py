@@ -1,5 +1,5 @@
-# Manticore iOS View Generator
-# Copyright (C) 2013, Richard H Fung at Yeti LLC
+# iOS View Generator
+# Copyright (C) 2013, Richard H Fung and Yeti LLC
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

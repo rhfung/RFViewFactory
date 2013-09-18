@@ -1,13 +1,13 @@
 //
-//  MCViewFactory.m
-//  Manticore iOSViewFactory
+//  RFViewFactory.m
+//  RFViewFactory
 //
 //  Created by Richard Fung on 1/31/13.
-//  Copyright (c) 2013 Yeti LLC. All rights reserved.
+//  Copyright (c) 2013 rhfung. All rights reserved.
 //
 
-#import "MCViewFactory.h"
-#import "MCMainViewController.h"
+#import "RFViewFactory.h"
+#import "RFMainViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
 
@@ -15,26 +15,26 @@
 #define AssertFileExists(path) NSAssert([[NSFileManager defaultManager] fileExistsAtPath:path], @"Cannot find the file: %@", path)
 #define AssertNibExists(file_name_string) AssertFileExists([[NSBundle mainBundle] pathForResource:file_name_string ofType:@"nib"])
 
-@interface MCViewFactoryEntry : NSObject {
+@interface RFViewFactoryEntry : NSObject {
 }
 @property NSString* nibName;
 @property NSString* className;
 
 @end
 
-@implementation MCViewFactoryEntry
+@implementation RFViewFactoryEntry
 @synthesize nibName;
 @synthesize className;
 
 @end
 
-@implementation MCViewFactory
+@implementation RFViewFactory
 
-static MCViewFactory* _sharedFactory = nil;
+static RFViewFactory* _sharedFactory = nil;
 
-+(MCViewFactory*)sharedFactory
++(RFViewFactory*)sharedFactory
 {
-	@synchronized([MCViewFactory class])
+	@synchronized([RFViewFactory class])
 	{
 		if (!_sharedFactory)
 			_sharedFactory = [[self alloc] init];
@@ -45,7 +45,7 @@ static MCViewFactory* _sharedFactory = nil;
 
 +(id)alloc
 {
-	@synchronized([MCViewFactory class])
+	@synchronized([RFViewFactory class])
 	{
 		NSAssert(_sharedFactory == nil, @"Attempted to allocate a second instance of a singleton.");
 		_sharedFactory = [super alloc];
@@ -65,7 +65,7 @@ static MCViewFactory* _sharedFactory = nil;
 }
 
 -(UIViewController*)createViewController:(NSString*)sectionOrViewName{
-  MCViewFactoryEntry* entry = [viewControllers objectForKey:sectionOrViewName];
+  RFViewFactoryEntry* entry = [viewControllers objectForKey:sectionOrViewName];
   Class class = NSClassFromString(sectionOrViewName);
   NSAssert(class != nil, @"Class must exist");
   
@@ -79,7 +79,7 @@ static MCViewFactory* _sharedFactory = nil;
 }
 
 -(void)registerView:(NSString*)sectionOrViewName{
-  MCViewFactoryEntry* entry = [[MCViewFactoryEntry alloc] init];
+  RFViewFactoryEntry* entry = [[RFViewFactoryEntry alloc] init];
   entry.nibName = sectionOrViewName;
   entry.className = sectionOrViewName;
   
@@ -87,7 +87,7 @@ static MCViewFactory* _sharedFactory = nil;
 }
 
 -(void)registerView:(NSString*)sectionOrViewName andNibName:(NSString*)nibName {
-  MCViewFactoryEntry* entry = [[MCViewFactoryEntry alloc] init];
+  RFViewFactoryEntry* entry = [[RFViewFactoryEntry alloc] init];
   entry.nibName = nibName;
   entry.className = sectionOrViewName;
   
