@@ -333,7 +333,9 @@ def main_script(schema_file, prefix, mode):
     print
 
     print "// Include the following lines in a reusable header file"
+    print "// Sections:"
     write_define(sections)
+    print "// Views:"
     write_define(views)
     print
     print "// Include the following lines in application:didFinishLaunchingWithOptions:"

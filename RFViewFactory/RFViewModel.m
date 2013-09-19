@@ -13,7 +13,7 @@
 @synthesize errorDict;
 @synthesize currentSection;
 @synthesize historyStack;
-@synthesize screenOverlay;
+@synthesize coachmark;
 @synthesize stackSize;
 
 +(RFViewModel*)sharedModel

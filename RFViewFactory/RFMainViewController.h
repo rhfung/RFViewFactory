@@ -18,8 +18,8 @@
   RFErrorViewController* errorVC;
   RFSectionViewController* currentSectionVC;
   RFIntent* activeIntent;
-  UIButton* screenOverlayButton;
-  NSArray* screenOverlaySlideshow;
+  UIButton* coachmarkButton;
+  NSArray* coachmarkSlides;
 }
 
 

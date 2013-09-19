@@ -30,6 +30,8 @@
 
 @implementation RFViewFactory
 
+@synthesize debugMode = _debugMode;
+
 +(RFViewFactory*)sharedFactory
 {
     static dispatch_once_t _singletonPredicate;
@@ -80,6 +82,10 @@
   entry.className = sectionOrViewName;
   
   [viewControllers setObject:entry  forKey:sectionOrViewName];
+    
+  if (_debugMode){
+    [self createViewController:sectionOrViewName];
+  }
 }
 
 -(void)registerView:(NSString*)sectionOrViewName andNibName:(NSString*)nibName {
@@ -88,6 +94,10 @@
   entry.className = sectionOrViewName;
   
   [viewControllers setObject:entry  forKey:sectionOrViewName];
+
+  if (_debugMode){
+    [self createViewController:sectionOrViewName];
+  }
 }
 
 // this method offers custom animations that are not provided by UIView, mainly the

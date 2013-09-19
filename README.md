@@ -234,26 +234,26 @@ The basic *MCErrorViewController* shows a grey window with a title, message body
 7. When registering your views in code, add the following line:
     `[factory registerView:VIEW_BUILTIN_ERROR];`
 
-Screen overlays
----------------
+Coachmarks
+----------
 
-Screen overlays are useful for giving instructions to the user. Screen overlays are implemented as UIImage resources embedded in the application. To show a screen overlay, call the following:
+Coachmarks are useful for giving instructions to the user. Coachmarks are implemented as UIImage resources embedded in the application. To show a coachmark image, call the following:
 
-    [RFViewModel sharedModel].screenOverlay = @"some-image";
+    [RFViewModel sharedModel].coachmark = @"some-image";
 
 The string `@"some-image"` should be an image that is compatible with `[UIImage imageNamed:@"some-image"]`.
 
-If the screen overlay is assigned several times, only the most recently overlay is shown.
+If the coachmark is assigned several times, only the most recent is shown.
 
-### Displaying a sequence of overlays
+### Displaying a sequence of coachmarks
 
-RFViewFactory shows screen overlays. When one overlay is dismissed, another overlay is shown until all of them are seen.
+RFViewFactory shows coachmarks. When one coachmark is dismissed, another coachmark is shown until all of them are seen.
 
-    [RFViewModel sharedModel].screenOverlays = @[@"image-1", @"image-2", @"image-3"];
+    [RFViewModel sharedModel].coachmarks = @[@"image-1", @"image-2", @"image-3"];
 
-### iPhone 4 and iPhone 5 overlays
+### iPhone 4 and iPhone 5 coachmarks
 
-RFViewFactory supports different overlays for iPhone 4 and iPhone 5. iPhone 5 overlays use the same name with a special suffix `_5`, which is added automatically. You should name your images as such:
+RFViewFactory supports different coachmarks for iPhone 4 and iPhone 5. iPhone 5 coachmarks use the same name with a special suffix `_5`, which is added automatically. You should name your images as such:
 
 * `some-image.png`
 * `some-image_5.png`
@@ -267,9 +267,11 @@ Release notes
 -------------
 
 0.1.0: branch of manticore-iosviewfactory by rhfung. 
+
 * All RF prefixes renamed to RF.
 * [RFViewModel sharedModel].currentSection now reflects the actual section & view when SECTION_LAST is assigned
 * proper way to create singletons with ARC
+* renamed screenOverlay and screenOverlays as coachmark and coachmarks
 
 0.0.9: added helper intent for navigating to the previous screen
 

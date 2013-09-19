@@ -46,8 +46,8 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
       // register to listeners on model changes
       [[RFViewModel sharedModel] addObserver:self forKeyPath:@"currentSection" options: NSKeyValueObservingOptionNew context: nil];
       [[RFViewModel sharedModel] addObserver:self forKeyPath:@"errorDict" options: NSKeyValueObservingOptionNew context: nil];
-      [[RFViewModel sharedModel] addObserver:self forKeyPath:@"screenOverlay" options: NSKeyValueObservingOptionNew context: nil];
-      [[RFViewModel sharedModel] addObserver:self forKeyPath:@"screenOverlays" options: NSKeyValueObservingOptionNew context: nil];
+      [[RFViewModel sharedModel] addObserver:self forKeyPath:@"coachmark" options: NSKeyValueObservingOptionNew context: nil];
+      [[RFViewModel sharedModel] addObserver:self forKeyPath:@"coachmarks" options: NSKeyValueObservingOptionNew context: nil];
       [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(flushViewCache:) name:@"RFMainViewController_flushViewCache" object:[RFViewModel sharedModel]]; // last parameter filters the response
     }
     return self;
@@ -110,14 +110,14 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
         
         [errorVC becomeFirstResponder]; // make the error dialog the first responder
       });
-  }else if ([keyPath isEqualToString:@"screenOverlay"]){
+  }else if ([keyPath isEqualToString:@"coachmark"]){
     rfvf_runOnMainQueueWithoutDeadlocking(^{
-      [self overlaySlideshow:@[[RFViewModel sharedModel].screenOverlay]];
+      [self showCoachmarks:@[[RFViewModel sharedModel].coachmark]];
     });
   }
-  else if ([keyPath isEqualToString:@"screenOverlays"]){
+  else if ([keyPath isEqualToString:@"coachmarks"]){
     rfvf_runOnMainQueueWithoutDeadlocking(^{
-      [self overlaySlideshow:[RFViewModel sharedModel].screenOverlays];
+      [self showCoachmarks:[RFViewModel sharedModel].coachmarks];
     });
   }else{
     [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
@@ -125,31 +125,31 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   
 }
 
--(void)overlaySlideshow:(NSArray*)overlays{
-  screenOverlaySlideshow = overlays;
+-(void)showCoachmarks:(NSArray*)overlays{
+  coachmarkSlides = overlays;
   
   if (!overlays || overlays.count == 0){
-    if (screenOverlayButton){
+    if (coachmarkButton){
       // fade out the overlay in 200 ms
-      screenOverlayButton.alpha = 1.0;
-      [UIView animateWithDuration:RFVIEWFACTORY_OVERLAY_ANIMATION_DURATION animations:^{
-        screenOverlayButton.alpha = 0.0;
+      coachmarkButton.alpha = 1.0;
+      [UIView animateWithDuration:RFVIEWFACTORY_COACHMARK_ANIMATION_DURATION animations:^{
+        coachmarkButton.alpha = 0.0;
       } completion:^(BOOL finished) {
-        [screenOverlayButton resignFirstResponder];
-        [screenOverlayButton removeFromSuperview];
-        screenOverlayButton = nil;
+        [coachmarkButton resignFirstResponder];
+        [coachmarkButton removeFromSuperview];
+        coachmarkButton = nil;
       }];
     }
     return;
   }
   
   // load the overlay 
-  if (!screenOverlayButton){
+  if (!coachmarkButton){
     // set up the geometry of the new screen overlay
     CGRect rect = [self.view bounds];
-    screenOverlayButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    screenOverlayButton.frame = rect;
-    screenOverlayButton.contentMode = UIViewContentModeScaleToFill;
+    coachmarkButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    coachmarkButton.frame = rect;
+    coachmarkButton.contentMode = UIViewContentModeScaleToFill;
   }
   
   // this code will load 2 images on iPhone 5, one for the small screen and another image for the large screen
@@ -167,7 +167,7 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   if (appFrame.size.height >= RFVIEWFACTORY_IOS5_SCREEN_SIZE) // add in the _5 to the filename, shouldn't append .png
   {
     // test for an iPhone 5 overlay. If available, use that overlay instead.
-    overlayName = [NSString stringWithFormat:@"%@%@", overlayName, RFVIEWFACTORY_IOS5_OVERLAY_SUFFIX];
+    overlayName = [NSString stringWithFormat:@"%@%@", overlayName, RFVIEWFACTORY_IOS5_COACHMARK_SUFFIX];
     if ([UIImage imageNamed:overlayName]){
       imgOverlay = [UIImage imageNamed:overlayName];
     }
@@ -175,31 +175,31 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   
   // show the new overlay
   if (imgOverlay){
-    [screenOverlayButton setImage:imgOverlay forState:UIControlStateNormal];
-    [screenOverlayButton addTarget:self action:@selector(overlayButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    if (![self.view.subviews containsObject:screenOverlayButton]){
-      screenOverlayButton.alpha = 0.0;
-      [self.view addSubview:screenOverlayButton ];
-      [UIView animateWithDuration:RFVIEWFACTORY_OVERLAY_ANIMATION_DURATION animations:^{
-        screenOverlayButton.alpha = 1.0;
+    [coachmarkButton setImage:imgOverlay forState:UIControlStateNormal];
+    [coachmarkButton addTarget:self action:@selector(coachmarkButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    if (![self.view.subviews containsObject:coachmarkButton]){
+      coachmarkButton.alpha = 0.0;
+      [self.view addSubview:coachmarkButton];
+      [UIView animateWithDuration:RFVIEWFACTORY_COACHMARK_ANIMATION_DURATION animations:^{
+        coachmarkButton.alpha = 1.0;
       }];
     }
-    [self.view bringSubviewToFront:screenOverlayButton];
-    [screenOverlayButton becomeFirstResponder];
+    [self.view bringSubviewToFront:coachmarkButton];
+    [coachmarkButton becomeFirstResponder];
   }else{
 #ifdef DEBUG
-    NSAssert(false, @"Screen overlay not found: %@", [RFViewModel sharedModel].screenOverlay);
+    NSAssert(false, @"Coachmark image file not found: %@", [RFViewModel sharedModel].coachmark);
 #endif
   }
 
 }
 
-- (void)overlayButtonPressed:(id)sender{
-  NSMutableArray* newArray = [NSMutableArray arrayWithArray:screenOverlaySlideshow];
+- (void)coachmarkButtonPressed:(id)sender{
+  NSMutableArray* newArray = [NSMutableArray arrayWithArray:coachmarkSlides];
   if (newArray.count > 0)
     [newArray removeObjectAtIndex:0];
-  screenOverlaySlideshow = newArray;
-  [self overlaySlideshow:newArray];
+  coachmarkSlides = newArray;
+  [self showCoachmarks:newArray];
 }
 
 -(RFViewController*) loadOrCreateViewController:(NSString*)sectionOrViewName{
