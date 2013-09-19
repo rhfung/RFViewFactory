@@ -166,9 +166,17 @@ def parse_view_schema(filename, prefix="", length="long"):
                     logging.warning("View name should have the same prefix as its owning section: %s" % vc_name)
 
             if is_section or line[-len(SECTION_SUFFIX):].lower() == SECTION_SUFFIX.lower():
-                sections.append({ "type" : "section", "variable_name": "SECTION_"  + string.upper(vc_name), "mapped_to" : prefix + line, "vc_name" : prefix + vc_name })
+                sections.append({ "type" : "section", 
+                    "variable_name": "SECTION_"  + string.upper(vc_name), 
+                    "mapped_to" : prefix + line,
+                     "vc_name" : prefix + vc_name,
+                     "section" : current_section })
             else:
-                views.append({ "type" : "view", "variable_name": "VIEW_" + string.upper(vc_name), "mapped_to" : prefix + line,  "vc_name" : prefix + vc_name })
+                views.append({ "type" : "view", 
+                    "variable_name": "VIEW_" + string.upper(vc_name), 
+                    "mapped_to" : prefix + line,  
+                    "vc_name" : prefix + vc_name,
+                    "section" : current_section })
 
             # read the next line
             line = f.readline()
@@ -299,17 +307,23 @@ def create_templates_from_schema(schema):
         # create the files
         template_dir = os.path.dirname(os.path.realpath(__file__)) + "/"
         for ext in ("xib", "h", "m"):
-            if check_file_exists(entry["mapped_to"], "." + ext):
-                first_choice = entry["mapped_to"] + "." + ext
-                actual_file = which_file_exists(entry["mapped_to"], "." + ext)
+            create_directory(entry["section"].lower())
+            output_file = entry["section"].lower() + "/" + entry["mapped_to"]
+            output_suffix = "." + ext
+            if check_file_exists(output_file, output_suffix):
+                first_choice = output_file + output_suffix
+                actual_file = which_file_exists(output_file, output_suffix)
                 if first_choice != actual_file:
                     logging.warning("Skipping %s because of %s" % (first_choice, actual_file))
                 else:
                     logging.warning("Skipping %s" % first_choice)
             else:
-                logging.info("Writing " + entry["mapped_to"] + "." + ext)
-                replace_in_file(template_dir + (template % ext), entry["mapped_to"] + "." + ext, dict)
+                logging.info("Writing " + output_file + output_suffix)
+                replace_in_file(template_dir + (template % ext), output_file + output_suffix, dict)
 
+def create_directory(dir_name):
+    if not os.path.isdir(dir_name):
+        os.mkdir(dir_name)
 
 def main_script(schema_file, prefix, mode):
     (sections, views) = parse_view_schema(schema_file, prefix, mode)
