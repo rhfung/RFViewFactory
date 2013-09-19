@@ -158,3 +158,11 @@
 }
 
 @end
+
+@implementation RFIntent (PrivateMethods)
+
+-(void)setSectionName:(NSString*)newName{
+    strSectionName = newName;
+}
+
+@end

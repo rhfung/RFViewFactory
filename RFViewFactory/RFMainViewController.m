@@ -28,6 +28,13 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   }
 }
 
+@interface RFIntent (PrivateMethods)
+
+-(void)setSectionName:(NSString*)newSectionName;
+
+@end
+
+
 @implementation RFMainViewController
 
 
@@ -260,7 +267,7 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
 
 -(RFIntent*)loadIntentAndHandleHistoryStack:(RFIntent*)intent{
   if ([[intent sectionName] isEqualToString:SECTION_LAST]){
-    // but don't retain the SECTION or VIEW
+    // but don't retain the SECTION or VIEW from the "previous" intent
     NSMutableDictionary* savedState = [NSMutableDictionary dictionaryWithDictionary:[intent savedInstanceState]];
     [savedState removeObjectForKey:@"viewName"]; // unusual design decision, sectionName is not saved in the savedState object
     
@@ -288,6 +295,11 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
     
     // replace the intent on the history stack
     [[previousIntent savedInstanceState] setValuesForKeysWithDictionary:savedState];
+      
+    // modify the object that was passed in with the appropriate information
+    [[intent savedInstanceState] setValuesForKeysWithDictionary:previousIntent.savedInstanceState];
+    intent.sectionName = previousIntent.sectionName;
+      
     return previousIntent;
   }else{
     // build the history stack

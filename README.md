@@ -266,7 +266,10 @@ Define `DEBUG` in compile settings to show debugger messages. `NSAssert` message
 Release notes
 -------------
 
-0.1.0: branch of manticore-iosviewfactory by rhfung. All RF prefixes renamed to RF.
+0.1.0: branch of manticore-iosviewfactory by rhfung. 
+* All RF prefixes renamed to RF.
+* [RFViewModel sharedModel].currentSection now reflects the actual section & view when SECTION_LAST is assigned
+* proper way to create singletons with ARC
 
 0.0.9: added helper intent for navigating to the previous screen
 
