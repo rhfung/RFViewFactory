@@ -30,28 +30,24 @@
 
 @implementation RFViewFactory
 
-static RFViewFactory* _sharedFactory = nil;
-
 +(RFViewFactory*)sharedFactory
 {
-	@synchronized([RFViewFactory class])
-	{
-		if (!_sharedFactory)
-			_sharedFactory = [[self alloc] init];
-		return _sharedFactory;
-	}
-	return nil;
+    static dispatch_once_t _singletonPredicate;
+    static RFViewFactory* _sharedFactory = nil;
+    
+	dispatch_once(&_singletonPredicate, ^{
+        _sharedFactory = [[super allocWithZone:nil] init];
+    });
+    
+    return _sharedFactory;
 }
 
-+(id)alloc
-{
-	@synchronized([RFViewFactory class])
-	{
-		NSAssert(_sharedFactory == nil, @"Attempted to allocate a second instance of a singleton.");
-		_sharedFactory = [super alloc];
-		return _sharedFactory;
-	}
-	return nil;
++ (id) allocWithZone:(NSZone *)zone {
+    return [self sharedFactory];
+}
+
++ (id) alloc {
+    return [self sharedFactory];
 }
 
 -(id)init{

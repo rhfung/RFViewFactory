@@ -6,8 +6,14 @@
 //  Copyright (c) 2013 rhfung. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 #import "RFConstants.h"
+#import "RFSectionViewController.h"
+#import "RFViewController.h"
+#import "RFViewFactory.h"
+#import "RFViewModel.h"
+#import "RFIntent.h"
+
+#import <Foundation/Foundation.h>
 
 @interface RFViewFactory : NSObject{
   NSMutableDictionary* viewControllers;

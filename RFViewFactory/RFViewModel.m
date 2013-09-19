@@ -16,18 +16,25 @@
 @synthesize screenOverlay;
 @synthesize stackSize;
 
-RFViewModel* _sharedModel;
-
 +(RFViewModel*)sharedModel
 {
-	@synchronized([RFViewModel class])
-	{
-		if (!_sharedModel)
-			_sharedModel = [[self alloc] init];
-		return _sharedModel;
-	}
-	return nil;
+    static dispatch_once_t _singletonPredicate;
+    static RFViewModel* _sharedModel = nil;
+
+    dispatch_once(&_singletonPredicate, ^{
+        _sharedModel = [[super allocWithZone:nil] init];
+    });
+	return _sharedModel;
 }
+
++ (id) allocWithZone:(NSZone *)zone {
+    return [self sharedModel];
+}
+
++ (id) alloc {
+    return [self sharedModel];
+}
+
 
 -(id)init{
   if (self = [super init]){
