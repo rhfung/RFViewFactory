@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # iOS View Generator
 # Copyright (C) 2013, Richard H Fung and Yeti LLC
 
@@ -12,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # This utility generates the define statements and mapping statements
-# for view controllers for MCViewFactory.h/m.
+# for view controllers for RFViewFactory.h/m.
 #
 # Assumptions:
 #    * Run from the project directory
@@ -70,9 +72,9 @@ def prefix_remover(name, prefix):
     return name
 
 def special_names(name):
-    if name == "MCMain":
+    if name == "MCMain" or name  == "RFMain":
         return "Builtin_Main"
-    elif name == "MCError":
+    elif name == "MCError" or name == "RFError":
         return "Builtin_Error"
     else:
         return name
@@ -98,7 +100,7 @@ def walk_directory(prefix=""):
                 vc_name = prefix_remover(filepart[0:pos], prefix)
                 vc_name = special_names(vc_name)
 
-                if string.find(contents, "MCSectionViewController") != -1 or string.find(contents, "SectionViewController") != -1:
+                if string.find(contents, "MCSectionViewController") != -1 or string.find(contents, "RFSectionViewController") != -1 or string.find(contents, "SectionViewController") != -1:
                     sections.append({ "type" : "section", "variable_name": "SECTION_"  + string.upper(vc_name), "mapped_to" : filepart})
                 else:
                     views.append({ "type" : "view", "variable_name": "VIEW_" + string.upper(vc_name), "mapped_to" : filepart })
@@ -271,20 +273,20 @@ def create_templates_from_schema(schema):
 
         # choose templates and base classes
         if entry["type"] == "section":
-            template = "TemplateSectionViewController.%s.template"
-            base_class = "MCSectionViewController"
+            template = "templates/TemplateSectionViewController.%s.template"
+            base_class = "RFSectionViewController"
         elif entry["type"] == "view":
-            template = "TemplateViewController.%s.template"
-            base_class = "MCViewController"
+            template = "templates/TemplateViewController.%s.template"
+            base_class = "RFViewController"
         else:
             print "Unknown type - " + entry["type"]
             continue
 
         # need to check special cases for MCMain and MCError
-        if entry["mapped_to"] == "MCMain":
-            base_class = "MCMainViewController"
-        elif entry["mapped_to"] == "MCError":
-            base_class = "MCErrorViewController"
+        if entry["mapped_to"] == "MCMain" or entry["mapped_to"] == "RFMain":
+            base_class = "RFMainViewController"
+        elif entry["mapped_to"] == "MCError" or entry["mapped_to"] == "RFError":
+            base_class = "RFErrorViewController"
 
         # define variable names to replace in the template file
         # if variable names are in the template and not listed here, they won't be replaced
@@ -321,12 +323,22 @@ def main_script(schema_file, prefix, mode):
     write_define(views)
     print
     print "// Include the following lines in application:didFinishLaunchingWithOptions:"
-    print "MCViewFactory *factory = [MCViewFactory sharedFactory];"
+    print "RFViewFactory *factory = [RFViewFactory sharedFactory];"
     write_register(sections)
     write_register(views)
 
 if len(sys.argv) != 4:
     print "Usage: %s <schema_file> <file_prefix> {short|long}" % sys.argv[0]
-    print "       where short suffix is VC and long suffix is ViewController"
+    print "Parameters:"
+    print "       <schema_file> A schema text file in the following format:"
+    print "              Section1:"
+    print "                  View1A"
+    print "                  View1B"
+    print "              Section2:"
+    print "                  View2A"
+    print "                  View2B"
+    print "       <file_prefix> A  2-character uppercase prefix that corresponds to XCode's classname prefix."
+    print "       long A long suffix ViewController is appended to every view name"
+    print "       short A short suffix VC is appended to every view name"
 else:
     main_script(sys.argv[1], sys.argv[2], sys.argv[3])
