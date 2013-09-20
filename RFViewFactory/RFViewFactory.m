@@ -65,7 +65,7 @@
 -(UIViewController*)createViewController:(NSString*)sectionOrViewName{
   RFViewFactoryEntry* entry = [viewControllers objectForKey:sectionOrViewName];
   Class class = NSClassFromString(sectionOrViewName);
-  NSAssert(class != nil, @"Class must exist");
+  NSAssert(class != nil, @"Class %@ is not found in your project", sectionOrViewName);
   
   AssertNibExists(entry.nibName);
   UIViewController* vc = [[class alloc] initWithNibName:entry.nibName bundle:nil] ;
