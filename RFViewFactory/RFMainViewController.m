@@ -382,14 +382,18 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   
   if (currentSectionVC != sectionVC){ // replace the section VC
 //        NSLog(@"Different section");
-    [self addChildViewController:sectionVC];
+
+    // configure the position and layout of the section frame to fit the main frame
     sectionVC.view.hidden = NO;
     CGRect rect = sectionVC.view.frame;
     rect.origin = CGPointMake(0, 0);
     rect.size = self.view.frame.size;
     [sectionVC.view setFrame:rect];
-    [self.view addSubview:sectionVC.view];
 
+    // three steps to show the VC
+    [self addChildViewController:sectionVC];
+    [self.view addSubview:sectionVC.view];
+    [sectionVC didMoveToParentViewController:self];
 
     RFSectionViewController* oldSectionVC = currentSectionVC;
     [oldSectionVC.currentViewVC resignFirstResponder];
@@ -399,15 +403,17 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
 //    BOOL opResult = [RFViewFactory applyTransitionToView:self.view transition:transitionStyle];
     BOOL opResult = [RFViewFactory applyTransitionFromView:currentSectionVC.view toView:sectionVC.view transition:transitionStyle completion:^{
       if (oldSectionVC != currentSectionVC){
+        [oldSectionVC willMoveToParentViewController:nil];
         [oldSectionVC.view removeFromSuperview];
         [oldSectionVC removeFromParentViewController];
       }
     }];
     
-    
+    // TODO: figure out why this code path gets called (note the transition speeds are different)
     if (!opResult && currentSectionVC.view != sectionVC.view){ // if animation was not applied
       [UIView transitionFromView:currentSectionVC.view toView:sectionVC.view duration:0.25 options:(transitionStyle | UIViewAnimationOptionShowHideTransitionViews) completion:^(BOOL finished) {
         if (oldSectionVC != currentSectionVC){
+          [oldSectionVC willMoveToParentViewController:nil];
           [oldSectionVC.view removeFromSuperview];
           [oldSectionVC removeFromParentViewController];
         }
@@ -415,7 +421,6 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
     }
     
     NSAssert(self.view.subviews.count < 5, @"clearing the view stack");
-    
     
     // reset the animation style, don't animate the view if the section has already been animated
     transitionStyle = UIViewAnimationOptionTransitionNone;
@@ -433,17 +438,23 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   
     if (viewVC){
 //          NSLog(@"attach view to section");
-      
-      [sectionVC addChildViewController:viewVC];
+
+      // size the view
       viewVC.view.hidden = NO;
       CGRect rect = viewVC.view.frame;
       rect.origin = CGPointMake(0, 0);
       rect.size = sectionVC.innerView.bounds.size;
       [viewVC.view setFrame:rect];
-      [sectionVC.innerView addSubview:viewVC.view];
 
+      // add the view to the section
+      [sectionVC addChildViewController:viewVC];
+      [sectionVC.innerView addSubview:viewVC.view];
+      [viewVC didMoveToParentViewController:sectionVC];
+
+      // TODO: why there's two code paths for animation here?
       BOOL opResult = [RFViewFactory applyTransitionFromView:oldViewVC.view toView:viewVC.view transition:transitionStyle completion:^{
         if (sectionVC.currentViewVC != oldViewVC){
+          [oldViewVC willMoveToParentViewController:nil];
           [oldViewVC.view removeFromSuperview];
           [oldViewVC removeFromParentViewController];
         }
@@ -453,14 +464,15 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
         
         [UIView transitionFromView:oldViewVC.view toView:viewVC.view duration:0.250 options:(transitionStyle |UIViewAnimationOptionShowHideTransitionViews) completion:^(BOOL finished) {
           if (sectionVC.currentViewVC != oldViewVC){
-          [oldViewVC.view removeFromSuperview];
-          [oldViewVC removeFromParentViewController];
+            [oldViewVC willMoveToParentViewController:nil];
+            [oldViewVC.view removeFromSuperview];
+            [oldViewVC removeFromParentViewController];
           }
         }];
       }
     } else { // no view controller
 //      NSLog(@"remove view from section");
-      
+      [oldViewVC willMoveToParentViewController:nil];
       [oldViewVC.view removeFromSuperview];
       [oldViewVC removeFromParentViewController];
     }
