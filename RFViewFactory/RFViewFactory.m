@@ -144,5 +144,16 @@
   return YES;
 }
 
+// call this method on load to register everything to the sharedFactory
++(void)registerView:(NSString*)sectionOrViewName{
+  return [[self sharedFactory] registerView:sectionOrViewName];
+}
+
+// call this method to instantiate a view (rarely called directly) to create view controllers
++(UIViewController*)createViewController:(NSString*)sectionOrViewName{
+  return [[self sharedFactory] createViewController:sectionOrViewName];
+}
+
+
 
 @end

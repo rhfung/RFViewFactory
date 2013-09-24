@@ -91,7 +91,7 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   //[errorDict objectForKey: @"name"];
       rfvf_runOnMainQueueWithoutDeadlocking(^{
         if (!errorVC)
-          errorVC = (RFErrorViewController*) [[RFViewFactory sharedFactory] createViewController:VIEW_BUILTIN_ERROR];
+          errorVC = (RFErrorViewController*) [RFViewFactory createViewController:VIEW_BUILTIN_ERROR];
         
         // remove from the previous
         [errorVC.view removeFromSuperview];
@@ -212,7 +212,7 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   RFViewController* vc = [dictCacheView objectForKey:sectionOrViewName];
   if (vc == nil){
     // create the view controller
-    vc = (RFViewController*) [[RFViewFactory sharedFactory] createViewController:sectionOrViewName];
+    vc = (RFViewController*) [RFViewFactory createViewController:sectionOrViewName];
     NSAssert(vc != nil, @"VC should exist");
     
     [vc onCreate];
@@ -229,7 +229,7 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   }
 
   // create the view controller
-  RFViewController* vc = (RFViewController*) [[RFViewFactory sharedFactory] createViewController:sectionOrViewName];
+  RFViewController* vc = (RFViewController*) [RFViewFactory createViewController:sectionOrViewName];
   NSAssert(vc != nil, @"VC should exist");
   [vc onCreate];
   [dictCacheView setObject:vc forKey:sectionOrViewName];
