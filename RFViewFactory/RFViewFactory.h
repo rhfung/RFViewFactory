@@ -17,6 +17,7 @@
 #import "RFViewFactory.h"
 #import "RFViewModel.h"
 #import "RFIntent.h"
+#import "UINavigationController+PopByName.h"
 
 #import <Foundation/Foundation.h>
 
