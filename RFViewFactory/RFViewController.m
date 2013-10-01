@@ -12,7 +12,7 @@
 
 @synthesize debugTag;
 
--(void)onCreate{
+-(void)onCreate:(NSDictionary*)creationDictionary {
   
 }
 

@@ -34,6 +34,9 @@
 // call this method to instantiate a view (rarely called directly) to create view controllers, same as calling the instance method on sharedFactory
 +(UIViewController*)createViewController:(NSString*)sectionOrViewName;
 
+// call this method to instantiate a view (rarely called directly) to create view controllers, same as calling the instance method on sharedFactory
++(UIViewController*)createViewController:(NSString*)sectionOrViewName withDictionary:(NSDictionary*)creationDictionary;
+
 // call this method to manually run the animation between views
 +(BOOL)applyTransitionFromView:(UIView*)oldView toView:(UIView*)newView transition:(int)value completion:(void (^)(void))completion;
 
@@ -48,6 +51,10 @@
 
 // call this method to instantiate a view (rarely called directly)
 -(UIViewController*)createViewController:(NSString*)sectionOrViewName;
+
+// call this method to instantiate a view (rarely called directly)
+-(UIViewController*)createViewController:(NSString*)sectionOrViewName withDictionary:(NSDictionary*)creationDictionary;
+
 
 
 @end

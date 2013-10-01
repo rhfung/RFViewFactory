@@ -1,8 +1,8 @@
-RF iOS View Factory
+RF View Factory
 ==========================
 
-*RFViewFactory* is a view controller factory pattern for creating iOS applications.
-Designed with a two-level hierarchical view controller structure for a tabbed application. 
+*RFViewFactory* is a view controller factory pattern for iPhone applications.
+Includes a two-level hierarchical view controller structure for a tabbed application. 
 Inspired by [Android activity lifecycle](http://developer.android.com/training/basics/activity-lifecycle/pausing.html).
 
 Installation
@@ -14,27 +14,20 @@ Early releases of RFViewFactory must be installed directly from this github repo
 
     pod 'RFViewFactory', '~> 0.1.0', :git => 'https://github.com/rhfung/RFViewFactory.git'
 
-Features
---------
+Components
+----------
 
-Features included with this release:
+* View factory
+* Scripts to create view controllers
+* Two-level hierarchical navigation view controller with a global history stack
 
-* Two-level hierarchical view controller
-* Intents to switch between activities, similar to Android intents
+View Factory
+============
 
-Basic Usage
------------
+Set up
+------
 
-    #import "RFViewFactory.h"
-
-After the application has loaded, for example, in `application:didFinishLaunchingWithOptions:`
-
-    // Some standard window setup
-
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    self.window.backgroundColor = [UIColor whiteColor];
-
-    // Register activities
+    // Register view controllers
 
     RFViewFactory *factory = [RFViewFactory sharedFactory];
 
@@ -43,14 +36,67 @@ After the application has loaded, for example, in `application:didFinishLaunchin
     [factory registerView:VIEW_BUILTIN_ERROR]; // comment this line out if you don't create RFErrorViewController.xib and subclass RFErrorViewController
     [factory registerView:@"YourSectionViewController"];
 
-    // Run the factory methods
+Usage
+-----
+
+Sections and views are created using:
+
+    RFViewController* vc = [[RFViewFactory sharedFactory] createViewController:@"MyViewController"];
+
+`createViewController:` is a low-level function that does not provide caching, `onResume`, and 
+`onPause` events. This factory method can be used to load nested view controllers or with
+UINavigationViewController.
+
+Loosely coupled setup instructions can be passed with a dictionary parameter.
+
+    RFViewController* vc = [[RFViewFactory sharedFactory] createViewController:@"MyViewController" 
+                                                                withDictionary:@{@"key" : @"value"}];
+
+The receiving RFViewController's `onCreate:` is overridden to read the dictionary. For example:
+
+    // in a subclass .m of RFViewController
+
+    -(void)onCreate:(NSDictionary *)creationDictionary {
+      self.nextWindow = creationDictionary[@"nextWindow"];
+    }
+
+Scripts
+=======
+
+TODO
+
+Two-Level Hierarchical Navigation Controller
+============================================
+
+Basic Usage
+-----------
+
+    #import <RFViewFactory/RFViewFactory.h>
+
+After the application has loaded, for example, in `application:didFinishLaunchingWithOptions:`
+
+    // Some standard window setup
+
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.backgroundColor = [UIColor whiteColor];
+
+    // Register view controllers
+
+    RFViewFactory *factory = [RFViewFactory sharedFactory];
+
+    // the following two lines are optional. Built in activities will show instead.
+    [factory registerView:VIEW_BUILTIN_MAIN];  // comment this line out if you don't create RFMainViewController.xib and subclass RFMainViewController
+    [factory registerView:VIEW_BUILTIN_ERROR]; // comment this line out if you don't create RFErrorViewController.xib and subclass RFErrorViewController
+    [factory registerView:@"YourSectionViewController"];
+
+    // Attach the two-level navigation view controller
 
     UIViewController* mainVC = [[RFViewFactory sharedFactory] createViewController:VIEW_BUILTIN_MAIN];
     [self.window setRootViewController:mainVC];
     [mainVC.view setFrame:[[UIScreen mainScreen] bounds]];
     [self.window makeKeyAndVisible];
 
-    // Show the main view controller
+    // Use the two-level navigation view controller
 
     RFIntent* intent = [RFIntent intentWithSectionName:@"YourSectionViewController"];
     [intent setAnimationStyle:UIViewAnimationOptionTransitionFlipFromLeft];
@@ -72,7 +118,7 @@ NOTE: I haven't tested a single-level hierarchy with all sections and no views.
 ### Two-Level Hierarchy
 
 All first-level view controllers should be suffixed with SectionViewController.
- Second-level view controllers can be registered and shown using the following snippets:
+Second-level view controllers can be registered and shown using the following snippets:
 
     [[RFViewFactory sharedFactory] registerView:@"YourViewController"];
 
@@ -142,23 +188,12 @@ Application state should be loaded to `[intent savedInstanceState]` when `onResu
 Modified view controller state should be saved `onPause:` when using the history stack.
 
 The first time a view controller is loaded, `onCreate` is fired once for non-GUI setup. 
-This event, however, is skipped if the view controller is loaded directly from RFViewFactory.
+`onCreate` is called before the .XIB file is loaded, so any GUI creation will likely fail.
+GUI creation is handled regularly in `viewDidLoad` or `awakeFromNib`.
 
 Cached view controllers can be flushed from memory with the following call:
 
     [[RFViewModel sharedModel] clearViewCache];
-
-View factory
-------------
-
-Sometimes a developer wishes to show view controllers without using intents. In this case,
-a dummy section should be created and subviews added inside. Then, the subviews are created
-directly using:
-
-    [[RFViewFactory sharedFactory] createViewController:@"MyViewController"]
-
-`createViewController:` is a low-level function that does not provide caching, `onCreate`, 
-`onResume`, and `onPause` events. This factory method can be used to load nested view controllers wherever and whenever you want.
 
 History stack
 -------------
@@ -263,6 +298,9 @@ Compiler settings
 
 Define `DEBUG` in compile settings to show debugger messages. `NSAssert` messages are unaffected by this setting.
 
+Notes
+=====
+
 Release notes
 -------------
 
@@ -271,19 +309,19 @@ Release notes
 * All RF prefixes renamed to RF.
 * [RFViewModel sharedModel].currentSection now reflects the actual section & view when SECTION_LAST is assigned
 * proper way to create singletons with ARC
-* renamed screenOverlay and screenOverlays as coachmark and coachmarks
+* renamed screenOverlay and screenOverlays as coachmark and coachmarks (breaking change)
+* `onCreate` is called in RFViewFactory, new method signature to override (breaking change)
+* autolayout removed
+* supports iOS 5
 
-0.0.9: added helper intent for navigating to the previous screen
+Based on the Manticore View Factory.
 
-0.0.8: added screen overlays
-
-0.0.7: solve a bug where fast switching between activities would cause all activities to disappear
-
-0.0.6: debug messages are written to the console log to ensure `onPause:` and `onResume:` superclass are called
-
-0.0.5: sections and views are properly resized and fitted to the parent
-
-0.0.4: first stable release
+* 0.0.9: added helper intent for navigating to the previous screen
+* 0.0.8: added screen overlays
+* 0.0.7: solve a bug where fast switching between activities would cause all activities to disappear
+* 0.0.6: debug messages are written to the console log to ensure `onPause:` and `onResume:` superclass are called
+* 0.0.5: sections and views are properly resized and fitted to the parent
+* 0.0.4: first stable release
 
 Known issues
 ------------
@@ -296,4 +334,5 @@ Known issues
 
   Add the script `rm -rf ${BUILT_PRODUCTS_DIR}` to the Pre-actions of the Build stage of your application's Scheme.
 
-* You'll implement `onResume` on a RFViewController but it doesn't get called. You probably overrode `onResume` on RFSectionViewController without calling `[super onResume:intent]`.
+* `onResume` doesn't get called. You probably overrode `onResume` on RFSectionViewController without 
+  calling `[super onResume:intent]`.

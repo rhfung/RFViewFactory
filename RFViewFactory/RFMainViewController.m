@@ -214,8 +214,6 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
     // create the view controller
     vc = (RFViewController*) [RFViewFactory createViewController:sectionOrViewName];
     NSAssert(vc != nil, @"VC should exist");
-    
-    [vc onCreate];
     [dictCacheView setObject:vc forKey:sectionOrViewName];
   }
   
@@ -231,7 +229,6 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
   // create the view controller
   RFViewController* vc = (RFViewController*) [RFViewFactory createViewController:sectionOrViewName];
   NSAssert(vc != nil, @"VC should exist");
-  [vc onCreate];
   [dictCacheView setObject:vc forKey:sectionOrViewName];
   return vc;
 }

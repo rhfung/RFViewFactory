@@ -62,13 +62,22 @@
   return self;
 }
 
--(UIViewController*)createViewController:(NSString*)sectionOrViewName{
+-(UIViewController*)createViewController:(NSString*)sectionOrViewName {
+  return [self createViewController:sectionOrViewName withDictionary:nil];
+}
+
+-(UIViewController*)createViewController:(NSString*)sectionOrViewName withDictionary:(NSDictionary *)creationDictionary {
   RFViewFactoryEntry* entry = [viewControllers objectForKey:sectionOrViewName];
   Class class = NSClassFromString(sectionOrViewName);
   NSAssert(class != nil, @"Class %@ is not found in your project", sectionOrViewName);
   
   AssertNibExists(entry.nibName);
   UIViewController* vc = [[class alloc] initWithNibName:entry.nibName bundle:nil] ;
+  
+  if ([vc isKindOfClass:[RFViewController class]]){
+    RFViewController* vc2 = (RFViewController*) vc;
+    [vc2 onCreate:creationDictionary];
+  }
   
 #ifdef DEBUG
   NSLog(@"Created a view controller %@", vc);
@@ -150,8 +159,14 @@
 }
 
 // call this method to instantiate a view (rarely called directly) to create view controllers
-+(UIViewController*)createViewController:(NSString*)sectionOrViewName{
-  return [[self sharedFactory] createViewController:sectionOrViewName];
++(UIViewController*)createViewController:(NSString*)sectionOrViewName {
+  return [RFViewFactory createViewController:sectionOrViewName withDictionary:nil];
+}
+
+// call this method to instantiate a view (rarely called directly) to create view controllers
++(UIViewController*)createViewController:(NSString*)sectionOrViewName withDictionary:(NSDictionary*)creationDictionary
+{
+  return [[self sharedFactory] createViewController:sectionOrViewName withDictionary:creationDictionary];
 }
 
 

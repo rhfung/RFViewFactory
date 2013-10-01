@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name         = "RFViewFactory"
   s.version      = "0.1.0"
-  s.summary      = "RFViewFactory is a view controller factory pattern for creating iOS applications, inspired from Android activity lifecycle."
+  s.summary      = "RFViewFactory is a view controller factory pattern for creating iPhone applications, inspired from Android activity lifecycle."
   s.description  = <<-DESC
           RFViewFactory is a view controller factory pattern for creating iOS applications.
           Designed with a two-level hierachical view controller structure. 
