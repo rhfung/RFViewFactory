@@ -14,7 +14,7 @@
 
 -(id)init{
   if(self=[super init]){
-    descripLabel.lineBreakMode = UILineBreakModeClip; //http://stackoverflow.com/questions/1054558/vertically-align-text-within-a-uilabel
+
   }
   return self;
 }
@@ -64,7 +64,15 @@
   }
   
   titleLabel.text = title;
-  descripLabel.text =  [NSString stringWithFormat:@"%@\n\n\n\n\n\n\n\n\n\n\n\n\n\n",description];
+  
+  // read http://stackoverflow.com/questions/1054558/vertically-align-text-within-a-uilabel for
+  // this implementation
+  CGRect savedFrame = descripLabel.frame;                   // save the original frame position and size
+  descripLabel.numberOfLines = 0;                           // show the text
+  descripLabel.text = description;
+  [descripLabel sizeToFit];
+  savedFrame.size.height = descripLabel.frame.size.height;  // note the new frame height
+  descripLabel.frame = savedFrame;
 }
 
 -(IBAction) dismissError: (id) sender {
