@@ -112,15 +112,7 @@
 // this method offers custom animations that are not provided by UIView, mainly the
 // slide left and right animations (no idea why Apple separated these animations)
 +(BOOL)applyTransitionFromView:(UIView*)oldView toView:(UIView*)newView transition:(int)value completion:(void (^)(void))completion  { // not the best place for this code but it'll work for now
-  NSString *transition = nil;
-  NSString *subTransition = nil;
-	if (value == ANIMATION_PUSH ) {
-    transition = kCATransitionPush;
-		subTransition = kCATransitionFromRight;
-	} else if (value == ANIMATION_POP ) {
-    transition = kCATransitionPush;
-		subTransition = kCATransitionFromLeft;
-  } else {
+	if (value == ANIMATION_PUSH || value == ANIMATION_POP) {
     return NO;
   }
 
