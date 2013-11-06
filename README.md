@@ -158,8 +158,8 @@ Valid animation styles include all valid UIViewAnimations and the following cons
 Custom instructions can be assigned for the receiving view's `onResume:`.
 
     RFIntent* intent = ...;
-    [[intent savedInstanceState] setObject:@"someValue" forKey:@"yourKey"];
-    [[intent savedInstanceState] setObject:@"anotherValue" forKey:@"anotherKey"];
+    [intent.extras setObject:@"someValue" forKey:@"yourKey"];
+    [intent.extras setObject:@"anotherValue" forKey:@"anotherKey"];
     // ...
     [[RFViewModel sharedModel] setCurrentSection:intent];
 
@@ -172,8 +172,8 @@ view receive `onResume` and `onPause` events.
 When a view is restored, saved intent information can be loaded using:
 
     -(void)onResume:(MCIntent *)intent {
-        NSObject* someValue = [intent.savedInstanceState objectForKey:@"yourKey"];
-        NSObject* anotherValue = [intent.savedInstanceState objectForKey:@"anotherKey"];
+        NSObject* someValue = [intent.extras objectForKey:@"yourKey"];
+        NSObject* anotherValue = [intent.extras objectForKey:@"anotherKey"];
 
         // ...
 
@@ -184,7 +184,7 @@ When a view is restored, saved intent information can be loaded using:
 ### View state
 
 View controllers are cached on first load and reused throughout the application lifetime.
-Application state should be loaded to `[intent savedInstanceState]` when `onResume:` is fired.
+Application state should be loaded to `intent.extras` when `onResume:` is fired.
 Modified view controller state should be saved `onPause:` when using the history stack.
 
 The first time a view controller is loaded, `onCreate` is fired once for non-GUI setup. 
@@ -304,7 +304,9 @@ Notes
 Release notes
 -------------
 
-0.1.0: branch of manticore-iosviewfactory by rhfung. 
+0.1.1: `getSavedInstanceState` renamed to `extras`
+
+0.1.0: branch of manticore-iosviewfactory by rhfung
 
 * All RF prefixes renamed to RF.
 * [RFViewModel sharedModel].currentSection now reflects the actual section & view when SECTION_LAST is assigned

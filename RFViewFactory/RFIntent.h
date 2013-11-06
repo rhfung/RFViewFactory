@@ -15,10 +15,6 @@
 //
 // ViewControllers are "activities" that receive bundles
 @interface RFIntent : NSObject
-{
-  NSString              *strSectionName;
-  NSMutableDictionary   *dictSavedInstanceState;
-}
 
 // Steps to use this object:
 //
@@ -36,7 +32,7 @@
 +(id) intentWithSectionName: (NSString*)name;
 
 // only used by the undo operation
-+(id) intentWithSectionName:(NSString*)name andSavedInstance:(NSMutableDictionary*)savedInstanceState;
++(id) intentWithSectionName:(NSString*)name andSavedInstance:(NSMutableDictionary*)extras;
 
 // preferable animations are ANIMATION_NOTHING, ANIMATION_PUSH, ANIMATION_POP, UIViewAnimationOptionTransitionCrossDissolve
 +(id) intentWithSectionName: (NSString*)name andAnimation:(UIViewAnimationOptions)animation;
@@ -56,7 +52,7 @@
 // getters
 @property (nonatomic, retain, readonly) NSString* sectionName;
 @property (nonatomic, retain, readonly) NSString* viewName;
-@property (nonatomic, retain, readonly) NSMutableDictionary* savedInstanceState;
+@property (nonatomic, retain, readonly) NSMutableDictionary* extras;
 @property () UIViewAnimationOptions animationStyle;
 
 

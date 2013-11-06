@@ -265,7 +265,7 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
 -(RFIntent*)loadIntentAndHandleHistoryStack:(RFIntent*)intent{
   if ([[intent sectionName] isEqualToString:SECTION_LAST]){
     // but don't retain the SECTION or VIEW from the "previous" intent
-    NSMutableDictionary* savedState = [NSMutableDictionary dictionaryWithDictionary:[intent savedInstanceState]];
+    NSMutableDictionary* savedState = [NSMutableDictionary dictionaryWithDictionary:[intent extras]];
     [savedState removeObjectForKey:@"viewName"]; // unusual design decision, sectionName is not saved in the savedState object
     
     // when  copying state values from the given intent, e.g., animation transition, to the old bundle
@@ -291,10 +291,10 @@ void rfvf_runOnMainQueueWithoutDeadlocking(void (^block)(void))
     }
     
     // replace the intent on the history stack
-    [[previousIntent savedInstanceState] setValuesForKeysWithDictionary:savedState];
+    [[previousIntent extras] setValuesForKeysWithDictionary:savedState];
       
     // modify the object that was passed in with the appropriate information
-    [[intent savedInstanceState] setValuesForKeysWithDictionary:previousIntent.savedInstanceState];
+    [[intent extras] setValuesForKeysWithDictionary:previousIntent.extras];
     intent.sectionName = previousIntent.sectionName;
       
     return previousIntent;

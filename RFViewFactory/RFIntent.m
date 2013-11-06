@@ -8,6 +8,13 @@
 
 #import "RFIntent.h"
 
+@interface RFIntent() {
+    NSString              *strSectionName;
+    NSMutableDictionary   *dictextras;
+}
+
+@end
+
 @implementation RFIntent
 
 
@@ -17,10 +24,10 @@
   return [newIntent initWithSectionName:name];
 }
 
-+(id) intentWithSectionName:(NSString*)name andSavedInstance:(NSMutableDictionary*)savedInstanceState
++(id) intentWithSectionName:(NSString*)name andSavedInstance:(NSMutableDictionary*)extras
 {
   RFIntent* newIntent = [RFIntent alloc];
-  return [newIntent initWithSectionName:name andSavedInstance:savedInstanceState];
+  return [newIntent initWithSectionName:name andSavedInstance:extras];
 }
 
 +(id) intentWithSectionName: (NSString*)name andAnimation:(UIViewAnimationOptions)animation
@@ -59,7 +66,7 @@
   if (self = [super init])
   {
     strSectionName = name;
-    dictSavedInstanceState = [NSMutableDictionary dictionaryWithCapacity:3];
+    dictextras = [NSMutableDictionary dictionaryWithCapacity:3];
   }
   return self;
 }
@@ -70,8 +77,8 @@
   {
     strSectionName = name;
     
-    dictSavedInstanceState = [NSMutableDictionary dictionaryWithCapacity:3];
-    [dictSavedInstanceState setObject:viewName forKey:@"viewName"];
+    dictextras = [NSMutableDictionary dictionaryWithCapacity:3];
+    [dictextras setObject:viewName forKey:@"viewName"];
     
   }
   return self;
@@ -83,8 +90,8 @@
   {
     strSectionName = name;
     
-    dictSavedInstanceState = [NSMutableDictionary dictionaryWithCapacity:3];
-    [dictSavedInstanceState setObject:viewName forKey:@"viewName"];
+    dictextras = [NSMutableDictionary dictionaryWithCapacity:3];
+    [dictextras setObject:viewName forKey:@"viewName"];
     [self setAnimationStyle:animation];
 
   }
@@ -96,18 +103,18 @@
   if (self = [super init])
   {
     strSectionName = name;
-    dictSavedInstanceState = [NSMutableDictionary dictionaryWithCapacity:3];
+    dictextras = [NSMutableDictionary dictionaryWithCapacity:3];
     [self setAnimationStyle:animation];
   }
   return self;
 }
 
--(id) initWithSectionName: (NSString*)name andSavedInstance:(NSMutableDictionary*)savedInstanceState
+-(id) initWithSectionName: (NSString*)name andSavedInstance:(NSMutableDictionary*)extras
 {
   if (self = [super init])
   {
     strSectionName = name;
-    dictSavedInstanceState = savedInstanceState;
+    dictextras = extras;
   }
   
   return self;
@@ -118,17 +125,17 @@
   return strSectionName;
 }
 
--(NSMutableDictionary*) savedInstanceState
+-(NSMutableDictionary*) extras
 {
-  return dictSavedInstanceState;
+  return dictextras;
 }
 
-// returns the viewName in the savedInstanceState, if available, or nil otherwise
+// returns the viewName in the extras, if available, or nil otherwise
 -(NSString*) viewName
 {
-  if (dictSavedInstanceState)
+  if (dictextras)
   {
-    return [dictSavedInstanceState objectForKey:@"viewName"];
+    return [dictextras objectForKey:@"viewName"];
   }
   else
   {
@@ -137,8 +144,8 @@
 }
 
 -(UIViewAnimationOptions)animationStyle{
-  if (dictSavedInstanceState){
-    return [[dictSavedInstanceState objectForKey:@"animationStyle"] intValue];
+  if (dictextras){
+    return [[dictextras objectForKey:@"animationStyle"] intValue];
   }
   else {
     return UIViewAnimationOptionTransitionNone;
@@ -146,15 +153,15 @@
 }
 
 -(void)setAnimationStyle:(UIViewAnimationOptions)animationStyle{
-  if (!dictSavedInstanceState){
-    dictSavedInstanceState = [NSMutableDictionary dictionaryWithCapacity:10];
+  if (!dictextras){
+    dictextras = [NSMutableDictionary dictionaryWithCapacity:10];
   }
   
-  [dictSavedInstanceState setObject:[NSNumber numberWithInt:animationStyle] forKey:@"animationStyle"];
+  [dictextras setObject:[NSNumber numberWithInt:animationStyle] forKey:@"animationStyle"];
 }
 
 -(NSString *)description{
-  return [NSString stringWithFormat:@"RFIntent section=%@, view=%@, dictionary=%@", self.sectionName, self.viewName, self.savedInstanceState];
+  return [NSString stringWithFormat:@"RFIntent section=%@, view=%@, dictionary=%@", self.sectionName, self.viewName, self.extras];
 }
 
 @end
