@@ -67,6 +67,10 @@
 }
 
 -(UIViewController*)createViewController:(NSString*)sectionOrViewName withDictionary:(NSDictionary *)creationDictionary {
+  return [self createViewController:sectionOrViewName withDictionary:creationDictionary testOnly:NO];
+}
+
+-(UIViewController*)createViewController:(NSString*)sectionOrViewName withDictionary:(NSDictionary *)creationDictionary testOnly:(BOOL)testFlag {
   RFViewFactoryEntry* entry = [viewControllers objectForKey:sectionOrViewName];
   Class class = NSClassFromString(sectionOrViewName);
   NSAssert(class != nil, @"Class %@ is not found in your project", sectionOrViewName);
@@ -74,7 +78,7 @@
   AssertNibExists(entry.nibName);
   UIViewController* vc = [[class alloc] initWithNibName:entry.nibName bundle:nil] ;
   
-  if ([vc isKindOfClass:[RFViewController class]]){
+  if ([vc isKindOfClass:[RFViewController class]] && !testFlag){
     RFViewController* vc2 = (RFViewController*) vc;
     [vc2 onCreate:creationDictionary];
   }
@@ -86,15 +90,7 @@
 }
 
 -(void)registerView:(NSString*)sectionOrViewName{
-  RFViewFactoryEntry* entry = [[RFViewFactoryEntry alloc] init];
-  entry.nibName = sectionOrViewName;
-  entry.className = sectionOrViewName;
-  
-  [viewControllers setObject:entry  forKey:sectionOrViewName];
-    
-  if (_debugMode){
-    [self createViewController:sectionOrViewName];
-  }
+  [self registerView:sectionOrViewName andNibName:sectionOrViewName];
 }
 
 -(void)registerView:(NSString*)sectionOrViewName andNibName:(NSString*)nibName {
@@ -105,7 +101,7 @@
   [viewControllers setObject:entry  forKey:sectionOrViewName];
 
   if (_debugMode){
-    [self createViewController:sectionOrViewName];
+    [self createViewController:sectionOrViewName withDictionary:Nil testOnly:YES];
   }
 }
 
