@@ -12,7 +12,7 @@ Install from CocoaPods using this repository.
 
 Early releases of RFViewFactory must be installed directly from this github repository:
 
-    pod 'RFViewFactory', '~> 0.1.0', :git => 'https://github.com/rhfung/RFViewFactory.git'
+    pod 'RFViewFactory', '~> 0.1.2', :git => 'https://github.com/rhfung/RFViewFactory.git'
 
 Components
 ----------
